@@ -51,6 +51,32 @@ def replace_variables(value: str, substitutions: dict[str, str]):
     return value
 
 
+def prepare_computed_vars(data: dict):
+    """Prepare computed variables"""
+    commits = data.get('commits', [])
+    raw_added: list[str] = []
+    raw_removed: list[str] = []
+    raw_modified: list[str] = []
+
+    for commit in commits:
+        raw_added.extend(commit.get('added', []))
+        raw_removed.extend(commit.get('removed', []))
+        raw_modified.extend(commit.get('modified', []))
+
+    # Prepare in one-line
+    added = '\n'.join([f'+ {line}' for line in raw_added])
+    removed = '\n'.join([f'- {line}' for line in raw_removed])
+    modified = '\n'.join([f'* {line}' for line in raw_modified])
+
+    # Return
+    return {
+        'added_files': added,
+        'removed_files': removed,
+        'modified_files': modified,
+        'ln': '\n',
+    }
+
+
 async def run(data: dict, event_map_list: list[event_map.EventMapConfig]):
     """
     Process the "push" event
@@ -95,6 +121,7 @@ async def run(data: dict, event_map_list: list[event_map.EventMapConfig]):
                 variables = extract_variables(message)
                 print(variables)
                 data_values = flatten_dict(data)
+                data_values.update(prepare_computed_vars(data))
                 message = replace_variables(message, data_values)
 
                 print('message from',
