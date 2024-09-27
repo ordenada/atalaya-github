@@ -2,10 +2,12 @@
 import os
 import hmac
 import hashlib
+import json
 from dotenv import load_dotenv
 from flask import Flask, request, abort, Response
 
-from webhook import ping
+import event_map
+from webhook import ping, push
 
 
 load_dotenv()
@@ -31,6 +33,16 @@ def verify_signature(secret: str, payload: str, signature: str):
     return hmac.compare_digest(expected_signature, signature)
 
 
+def load_config():
+    """Load config from config.json"""
+    with open('config.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    # Get the event map config
+    event_map_list: list[event_map.EventMapConfig] = data['events']
+    return event_map_list
+
+
 app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
 async def webhook_receiver():
@@ -48,10 +60,20 @@ async def webhook_receiver():
 
     print("Received webhook data:", data)
 
+    event_map_list = load_config()
+    events = [
+        event_map
+        for event_map in event_map_list
+        if event \
+            and event_map['_'] == 'event-map' \
+                and event_map['event_type'] == event]
+
     if not event:
         abort(400)
     elif event == 'ping':
         await ping.run(data)
+    elif event == 'push':
+        await push.run(data, event_map_list=events)
     else:
         abort(400)
 
