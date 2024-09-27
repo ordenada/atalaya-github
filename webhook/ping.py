@@ -2,11 +2,8 @@
 Manager the "ping" event
 """
 
-from flask import jsonify
-
-
-async def run(_data: dict):
+async def run(data: dict):
     """
-    Return "pong"
+    Process the "ping" event
     """
-    return jsonify({"msg": "pong"}), 200
+    print(f'ping: {data["zen"]} - {data["hook_id"]}')

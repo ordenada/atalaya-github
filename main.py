@@ -2,7 +2,6 @@
 import os
 import hmac
 import hashlib
-from typing import Optional
 from dotenv import load_dotenv
 from flask import Flask, request, abort, Response
 
@@ -49,15 +48,10 @@ async def webhook_receiver():
 
     print("Received webhook data:", data)
 
-    reply: Optional[tuple[Response, int]] = None
-
     if not event:
         abort(400)
     elif event == 'ping':
-        reply = await ping.run(data)
-
-    if reply:
-        return reply
+        await ping.run(data)
 
     return Response(status=204)
 
