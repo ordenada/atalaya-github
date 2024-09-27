@@ -7,6 +7,7 @@ from typing import cast
 import event_map
 from communications.telegram.bot import TelegramBot
 
+
 def flatten_dict(d, parent_key='', sep='.'):
     """Flat a dict in one-dimension dict"""
     items = {}
@@ -20,6 +21,7 @@ def flatten_dict(d, parent_key='', sep='.'):
         else:
             items[new_key] = v
     return items
+
 
 def extract_variables(value):
     """Extract variables"""
