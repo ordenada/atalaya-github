@@ -34,7 +34,7 @@ def verify_signature(secret: str, payload: str, signature: str):
 
 app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
-def webhook_receiver():
+async def webhook_receiver():
     """webhook"""
     signature = request.headers.get('X-Hub-Signature-256')
     payload = request.data
