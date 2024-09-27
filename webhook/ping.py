@@ -5,7 +5,7 @@ Manager the "ping" event
 from flask import jsonify
 
 
-def run(_data: dict):
+async def run(_data: dict):
     """
     Return "pong"
     """

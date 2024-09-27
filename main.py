@@ -54,7 +54,7 @@ async def webhook_receiver():
     if not event:
         abort(400)
     elif event == 'ping':
-        reply = ping.run(data)
+        reply = await ping.run(data)
 
     if reply:
         return reply
